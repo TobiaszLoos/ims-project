@@ -9,14 +9,14 @@ import javax.swing.JFrame;
 import org.math.plot.Plot2DPanel;
 
 public class ReadCSV 
-{
-    public static double[] x;
-    public static double[] y;
-    public static double[][] centy;
-    public static double[][] centx;
-    
+{ 
 	public static void main(String[] args)
 	{
+	    double[] x;
+	    double[] y;
+	    double[][] centy;
+	    double[][] centx;
+	    
 		String file = "C:\\Users\\Tobiasz\\EclipseProjects\\ims-template-master\\doc\\wifigdansk.csv";
 		List<double[]> myListofXY = new ArrayList<double[]>();
 		myListofXY = Read(file);
@@ -35,9 +35,9 @@ public class ReadCSV
 		};
 		
 		System.out.println("In case of y");
-		centy = getCentroid(y, k, centroidy);
+		centy = getCentroid(y, x, k, centroidy);
 		System.out.println("In case of x");
-		centx = getCentroid(x, k, centroidx);
+		centx = getCentroid(x, y, k, centroidx);
 		
 		System.out.println("Center of firts region: " + centx[1][0] + ", " + centy[1][0]);
 		System.out.println("Center of second region: " + centx[1][1] + ", " + centy[1][1]);
@@ -104,7 +104,7 @@ public class ReadCSV
 		return myList;
 	}
 	
-	public static double[][] getCentroid(double data[], int k, double centroid[][])
+	public static double[][] getCentroid(double data[], double data2[], int k, double centroid[][])
 	{
 		double distance[][] = new double[k][data.length];
 		double cluster[] = new double[data.length];
@@ -154,7 +154,7 @@ public class ReadCSV
 		
 		if(!isAchived)
 		{             
-			getCentroid(data, k, centroid);
+			getCentroid(data, data2, k, centroid);
 		}
 		
 		if(isAchived)
@@ -162,26 +162,46 @@ public class ReadCSV
 			System.out.println("======================================== ");
 			System.out.println(" ");
 			System.out.println("Final cordnate is");
+			Plot2DPanel plot = new Plot2DPanel();
 			
 			for(int i = 0; i < k; i++)
 			{	
-                System.out.print("Region " + (i + 1) + ": ");
-                int a = 0; 
+                System.out.println("Region " + (i + 1) + ": ");
+                int a = 1;
                 
 				for(int j = 0; j < data.length; j++)
 				{
 					if(cluster[j] == i)
 					{
-						System.out.print(data[j] + ", ");
 						a++;
 					}
 				}
 				
+                double cx[] = new double[a - 1];
+                double cy[] = new double[a - 1];
+                a = 0;
+                
+				for(int j = 0; j < data.length; j++)
+				{
+					if(cluster[j] == i)
+					{
+						System.out.println(data[j] + ", " + data2[j] + "; ");
+						cx[a] = data[j];
+						cy[a] = data2[j];
+						a++;
+					}
+				}
+				
+				plot.addScatterPlot("cluster", cy, cx);
 				System.out.println("");
-				System.out.print("Mean value of hotspots is " + a);
+				System.out.println("Value of hotspots is " + a);
 				System.out.println("");
 			}
 			
+	        JFrame frame = new JFrame("Wifi Location");
+	        frame.setSize(900, 900);
+	        frame.setContentPane(plot);
+	        frame.setVisible(true);
 			System.out.println("");
 		}
 		
